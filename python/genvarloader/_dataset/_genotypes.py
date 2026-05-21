@@ -469,7 +469,12 @@ def choose_exonic_variants(
         ref_end: int = ends[query]
         for hap in nb.prange(ploidy):
             o_idx = geno_offset_idxs[query, hap]
-            o_s, o_e = geno_offsets[o_idx], geno_offsets[o_idx + 1]
+            # Mirror the ndim guard from the first loop (lines ~455-458).
+            # Cherry-pick of mcvickerlab/GenVarLoader#170 onto v0.24.1.
+            if geno_offsets.ndim == 1:
+                o_s, o_e = geno_offsets[o_idx], geno_offsets[o_idx + 1]
+            else:
+                o_s, o_e = geno_offsets[o_idx]
             qh_genos = geno_v_idxs[o_s:o_e]
 
             k_idx = query * ploidy + hap
